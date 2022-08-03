@@ -1,0 +1,14 @@
+# This pipeline timeout with 125 exit code (constant errExitCode)
+name: test-pipeline-004
+steps:
+  - name: exit-64
+    path: sh
+    args:
+    - -c
+    - sleep 2; exit 64
+    onExit: propagate-if-err
+    timeout: 1s
+  - name: exit-true
+    path: /bin/true
+log:
+  debug: true

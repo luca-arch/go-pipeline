@@ -1,0 +1,24 @@
+# This pipeline prints to /dev/null and terminates with success
+name: test-pipeline-001
+steps:
+  - path: echo
+    args:
+    - This is the first step
+    name: print-0a
+    stdout: devnul
+  - parallel:
+    - path: echo
+      args:
+      - This is the first parallel step
+      name: paral-0
+      stdout: devnul
+    - path: echo
+      args:
+      - This is the second parallel step
+      name: paral-1
+      stdout: devnul
+    - path: echo
+      args:
+      - This is the third parallel step
+      name: paral-2
+      stdout: devnul

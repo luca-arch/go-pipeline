@@ -1,0 +1,11 @@
+# This pipeline propagates the 125 exit code (constant errExitCode)
+name: test-pipeline-003
+steps:
+  - path: sh
+    args:
+    - -c
+    - exit 64
+    onExit: none
+    timeout: 1m
+  - path: /invalid/bin
+    onExit: propagate-if-err

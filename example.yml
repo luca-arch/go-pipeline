@@ -1,0 +1,62 @@
+name: z6-root
+
+log:
+  debug: true
+  disabled: false
+
+steps:
+  - path: /bin/sh
+    args:
+    - -c
+    - echo Hello stage 0a
+    name: print-0a
+    stderr: /tmp/0a.stderr
+    stdout: /tmp/0a.stdout
+  - path: /bin/sh
+    args:
+    - -c
+    - echo Hello stage 0b
+    name: print-0b
+    stderr: /tmp/0b.stderr
+    stdout: /tmp/0b.stdout
+    # parallel:      # Warning
+    #   - path: date # Warning
+  - name: stage1
+    parallel:
+    - path: date
+      name: daemon-0
+      stderr: /tmp/date.stderr
+      stdout: /tmp/date.stdout
+    - path: /bin/sh
+      name: daemon-1
+      args:
+      - -c
+      - |
+        sleep 0.2
+        exit 1
+      onExit: restart
+    - path: /bin/sh
+      name: daemon-2
+      args:
+      - -ec
+      - |
+        sleep 100
+        exit 16
+      onExit: propagate-if-err
+      stderr: /dev/stderr
+      stdout: /dev/stdout
+    - path: /bin/sh
+      name: daemon-3
+      args:
+      - -ec
+      - |
+        sleep 1000
+      onExit: propagate
+    - path: /bin/sh
+      name: daemon-4
+      args:
+      - -ec
+      - |
+        sleep 2
+        exit 8
+      onExit: propagate

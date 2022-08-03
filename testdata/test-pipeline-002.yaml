@@ -1,0 +1,29 @@
+# This pipeline propagates the 67 exit code
+name: test-pipeline-002
+steps:
+  - path: sh
+    args:
+    - -c
+    - exit 64
+    onExit: none
+  - parallel:
+    - path: sh
+      args:
+      - -c
+      - exit 65
+      onExit: none
+    - path: sh
+      args:
+      - -c
+      - sleep 0.1 && exit 66
+      onExit: restart-if-err
+    - path: sh
+      args:
+      - -c
+      - sleep 0.2 && exit 67
+      onExit: propagate
+    - path: sh
+      args:
+      - -c
+      - sleep 0.3 && exit 68
+      onExit: none
