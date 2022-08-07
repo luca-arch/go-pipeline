@@ -10,6 +10,7 @@ cover: test                                         ### Run tests, with coverage
 
 dist-native:                               ### Compile binaries (native platform)
 	go build -o pipeline_native ./cmd
+	go build -o template_native ./template
 .PHONY: dist
 
 dist-linux: docker-all                              ### Compile binaries (Linux)
