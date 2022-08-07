@@ -2,6 +2,7 @@
 package pipeline
 
 import (
+	"io/ioutil"
 	"os"
 
 	"github.com/pkg/errors"
@@ -10,7 +11,17 @@ import (
 
 // NewFromFile reads a YAML file and parse it as a Node.
 func NewFromFile(file string) (*Node, error) {
-	str, err := os.ReadFile(file)
+	var (
+		str []byte
+		err error
+	)
+
+	if file == "-" {
+		str, err = ioutil.ReadAll(os.Stdin)
+	} else {
+		str, err = os.ReadFile(file)
+	}
+
 	if err != nil {
 		return nil, errors.Wrapf(err, "cannot open %s", file)
 	}
