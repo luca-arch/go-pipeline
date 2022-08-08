@@ -23,7 +23,7 @@ type task interface {
 func Pipeline() (task, error) {
 	args := CliArgs()
 
-	if len(args.TemplateFiles) > 0 {
+	if len(args.TemplateFiles) == 1 {
 		tplCtx, err := template.Context(args.ContextFiles, args.Overrides)
 		if err != nil {
 			return nil, err
@@ -36,6 +36,7 @@ func Pipeline() (task, error) {
 
 		if args.PrintOnly {
 			fmt.Printf(output)
+			os.Stderr.WriteString("--print-only "+args.TemplateFiles[0])
 			os.Exit(0)
 		}
 

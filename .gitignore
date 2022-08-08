@@ -3,9 +3,6 @@ cover.out
 pipeline_darwin_*
 pipeline_linux_*
 pipeline_native
-template_darwin_*
-template_linux_*
-template_native
 
 # These are some examples of commonly ignored file patterns.
 # You should customize this list as applicable to your project.

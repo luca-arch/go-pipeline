@@ -22,7 +22,6 @@ COPY . /build
 
 WORKDIR /build
 RUN go build -o /bin/pipeline ./cmd
-RUN go build -o /bin/template ./template
 
 #########################################
 # Step 3: Final                         #
@@ -30,7 +29,6 @@ RUN go build -o /bin/template ./template
 FROM busybox
 
 COPY --from=builder /bin/pipeline /bin/pipeline
-COPY --from=builder /bin/template /bin/template
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 ENTRYPOINT ["/bin/pipeline"]
