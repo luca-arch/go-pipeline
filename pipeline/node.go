@@ -5,8 +5,8 @@ import (
 	"context"
 	"time"
 
-	"bitbucket.org/lucacontini/z6/pipeline/loop"
-	"bitbucket.org/lucacontini/z6/pipeline/subprocess"
+	"github.com/luca-arch/go-pipeline/pipeline/loop"
+	"github.com/luca-arch/go-pipeline/pipeline/subprocess"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 )

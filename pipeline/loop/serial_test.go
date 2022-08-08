@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"bitbucket.org/lucacontini/z6/pipeline/loop"
+	"github.com/luca-arch/go-pipeline/pipeline/loop"
 	"github.com/stretchr/testify/assert"
 )
 

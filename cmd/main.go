@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
 
-	"bitbucket.org/lucacontini/z6/pipeline"
+	"github.com/luca-arch/go-pipeline/pipeline"
+	"github.com/luca-arch/go-pipeline/template"
 	"github.com/pkg/errors"
 )
 
@@ -16,6 +18,35 @@ const errExitCode = 125
 // task represents a task that can run.
 type task interface {
 	Run(context.Context) error
+}
+
+func Pipeline() (task, error) {
+	args := CliArgs()
+
+	if len(args.TemplateFiles) > 0 {
+		tplCtx, err := template.Context(args.ContextFiles, args.Overrides)
+		if err != nil {
+			return nil, err
+		}
+
+		output, err := template.Print(args.TemplateFiles[0], tplCtx)
+		if err != nil {
+			return nil, err
+		}
+
+		if args.PrintOnly {
+			fmt.Printf(output)
+			os.Exit(0)
+		}
+
+		return pipeline.New(output)
+	}
+
+	if len(args.PipelineFiles) == 1 {
+		return pipeline.NewFromFile(args.PipelineFiles[0])
+	}
+
+	return nil, errors.New("either specify a pipeline or a template file")
 }
 
 // Run executes a task and returns any propagated exit code.
@@ -37,7 +68,7 @@ func Run(e task) int {
 }
 
 func main() {
-	task, err := pipeline.NewFromFile(os.Args[1])
+	task, err := Pipeline()
 	if err != nil {
 		log.Fatalf("error %v", err)
 	}

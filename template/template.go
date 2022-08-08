@@ -1,78 +1,61 @@
-package main
+package template
 
 import (
-	"flag"
-	"log"
+	"bytes"
 	"os"
 	"strings"
 	"text/template"
 
+	"github.com/imdario/mergo"
 	"gopkg.in/yaml.v3"
 )
 
-type cliContextOverride []string
-
-func (c *cliContextOverride) Set(value string) error {
-	*c = append(*c, value)
-
-	return nil
-}
-
-func (c *cliContextOverride) String() string {
-	return ""
-}
-
-func Parse(templateFile, contextFile string, overrides cliContextOverride) {
-	funcMap := template.FuncMap{
-		// "title": strings.Title,
-	}
-
+func Context(files []string, vars []string) (map[string]interface{}, error) {
 	context := make(map[string]interface{})
-	if contextFile != "" {
-		if err := yaml.Unmarshal([]byte(mustOpenFile(contextFile)), &context); err != nil {
-			log.Fatalf("%s: %s", contextFile, err)
+
+	for _, ctxFile := range files {
+		tmpCtx := make(map[string]interface{})
+
+		yml, err := os.ReadFile(ctxFile)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := yaml.Unmarshal(yml, &tmpCtx); err != nil {
+			return nil, err
+		}
+
+		if err := mergo.Merge(&context, tmpCtx); err != nil {
+			return nil, err
 		}
 	}
 
-	for n := range overrides {
-		s := strings.SplitN(overrides[n], "=", 2) // nolint:gomnd // legit
+	for n := range vars {
+		s := strings.SplitN(vars[n], "=", 2) // nolint:gomnd // legit
 		context[s[0]] = s[1]
 	}
 
-	templateText := mustOpenFile(templateFile)
-	if templateText == "" {
-		log.Fatalf("%s: empty template", templateFile)
-	}
-
-	tmpl, err := template.New(templateText).Funcs(funcMap).Parse(templateText)
-	if err != nil {
-		log.Fatalf("parsing: %s", err)
-	}
-
-	err = tmpl.Execute(os.Stdout, context)
-	if err != nil {
-		log.Fatalf("execution: %s", err)
-	}
+	return context, nil
 }
 
-func main() {
-	var overrides cliContextOverride
-
-	flag.Var(&overrides, "set", "Context overrides")
-
-	templateFile := flag.String("template-file", "", "Path to template file")
-	contextFile := flag.String("context-file", "", "Path to context file")
-
-	flag.Parse()
-
-	Parse(*templateFile, *contextFile, overrides)
-}
-
-func mustOpenFile(file string) string {
-	body, err := os.ReadFile(file)
+func Print(templateFile string, context map[string]interface{}) (string, error) {
+	templateText, err := os.ReadFile(templateFile)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
-	return string(body)
+	tmpl, err := template.New(templateFile).
+		Funcs(templateFunctions()).
+		Parse(string(templateText))
+	if err != nil {
+		return "", err
+	}
+
+	buf := new(bytes.Buffer)
+	err = tmpl.Execute(buf, context)
+	if err != nil {
+		return "", err
+	}
+
+	return buf.String(), nil
 }

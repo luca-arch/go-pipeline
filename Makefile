@@ -8,7 +8,7 @@ cover: test                                         ### Run tests, with coverage
 	go tool cover -html=cover.out -o cover.html
 .PHONY: cover
 
-dist-native:                               ### Compile binaries (native platform)
+dist-native:                              ### Compile binaries (native platform)
 	go build -o pipeline_native ./cmd
 	go build -o template_native ./template
 .PHONY: dist

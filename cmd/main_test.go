@@ -3,8 +3,8 @@ package main_test
 import (
 	"testing"
 
-	main "bitbucket.org/lucacontini/z6/cmd"
-	"bitbucket.org/lucacontini/z6/pipeline"
+	main "github.com/luca-arch/go-pipeline/cmd"
+	"github.com/luca-arch/go-pipeline/pipeline"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

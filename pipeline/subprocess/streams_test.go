@@ -4,7 +4,7 @@ import (
 	"os"
 	"testing"
 
-	"bitbucket.org/lucacontini/z6/pipeline/subprocess"
+	"github.com/luca-arch/go-pipeline/pipeline/subprocess"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
