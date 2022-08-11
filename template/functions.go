@@ -2,6 +2,7 @@ package template
 
 import (
 	"os"
+	"path/filepath"
 	"text/template"
 )
 
@@ -23,5 +24,6 @@ func templateFunctions() template.FuncMap {
 
 			return !fileInfo.IsDir()
 		},
+		"readLink": filepath.Abs,
 	}
 }

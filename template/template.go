@@ -6,15 +6,16 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/imdario/mergo"
 	"gopkg.in/yaml.v3"
 )
 
-func Context(files []string, vars []string) (map[string]interface{}, error) {
-	context := make(map[string]interface{})
+type tplContext map[string]interface{}
+
+func Context(files []string, vars []string) (tplContext, error) {
+	context := make(tplContext)
 
 	for _, ctxFile := range files {
-		tmpCtx := make(map[string]interface{})
+		tmpCtx := make(tplContext)
 
 		yml, err := os.ReadFile(ctxFile)
 		if err != nil {
@@ -25,9 +26,7 @@ func Context(files []string, vars []string) (map[string]interface{}, error) {
 			return nil, err
 		}
 
-		if err := mergo.Merge(&context, tmpCtx); err != nil {
-			return nil, err
-		}
+		context = mergeMaps(context, tmpCtx)
 	}
 
 	for n := range vars {
@@ -38,7 +37,7 @@ func Context(files []string, vars []string) (map[string]interface{}, error) {
 	return context, nil
 }
 
-func Print(templateFile string, context map[string]interface{}) (string, error) {
+func Print(templateFile string, context tplContext) (string, error) {
 	templateText, err := os.ReadFile(templateFile)
 	if err != nil {
 		return "", err
@@ -58,4 +57,23 @@ func Print(templateFile string, context map[string]interface{}) (string, error) 
 	}
 
 	return buf.String(), nil
+}
+
+func mergeMaps(b, a tplContext) tplContext {
+	out := make(tplContext, len(a))
+	for k, v := range a {
+		out[k] = v
+	}
+	for k, v := range b {
+		if v, ok := v.(tplContext); ok {
+			if bv, ok := out[k]; ok {
+				if bv, ok := bv.(tplContext); ok {
+					out[k] = mergeMaps(bv, v)
+					continue
+				}
+			}
+		}
+		out[k] = v
+	}
+	return out
 }

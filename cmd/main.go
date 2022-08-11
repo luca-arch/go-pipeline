@@ -36,7 +36,6 @@ func Pipeline() (task, error) {
 
 		if args.PrintOnly {
 			fmt.Printf(output)
-			os.Stderr.WriteString("--print-only "+args.TemplateFiles[0])
 			os.Exit(0)
 		}
 
